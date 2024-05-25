@@ -31,6 +31,8 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
+	// set file watchdog
+	go configurations.FileWatch(configsPath, configs.Reload)
 
 	// log.Println("Loading Commands macros")
 	// plugins := LoadCommands()
