@@ -39,7 +39,7 @@ func main() {
 	// client.ReadChat(plugins)
 
 	// create ui configs
-	ui := ui.NewUI(titleView, banner)
+	mainUI := ui.NewUI(titleView, banner)
 	uiStarted := make(chan struct{}, 1)
 
 	// create twitch client
@@ -47,9 +47,9 @@ func main() {
 		configs.TwitchIRL,
 		configs.Channel,
 		configs.Debug,
-		ui.WriteMain,
-		ui.WriteCmd,
-		ui.WriteSide,
+		mainUI.WriteMain,
+		mainUI.WriteCmd,
+		mainUI.WriteSide,
 	)
 	defer client.Close()
 
@@ -57,5 +57,5 @@ func main() {
 	go client.StartBot(uiStarted)
 
 	// start graphica interface
-	ui.Start(uiStarted)
+	mainUI.Start(uiStarted)
 }

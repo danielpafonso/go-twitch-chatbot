@@ -150,6 +150,9 @@ func (client *TwitchClient) ReadChat() {
 				}
 				continue
 			}
+			if errors.Is(err, net.ErrClosed) {
+				return
+			}
 			client.WriterMain(fmt.Sprintf("ERROR[%T] %s\n", err, err))
 			connected = false
 		}
