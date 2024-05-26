@@ -71,10 +71,14 @@ func (client *TwitchClient) Close() {
 }
 
 func (client *TwitchClient) WriteCurrentConfigs() {
-	client.WriterConfig("Configurations:\n", true)
-	client.WriterConfig(fmt.Sprintf(" Channel: %s\n", client.Channel))
-	client.WriterConfig(fmt.Sprintf(" Debug mode: %v\n", client.Debug))
-	client.WriterConfig("\nPlugins:\n")
+	client.WriterConfig(
+		fmt.Sprintf(
+			"Configurations:\n Channel: %s\n Debug mode: %v\n\nPlugins:\n",
+			client.Channel,
+			client.Debug,
+		),
+		true,
+	)
 	for _, plugin := range client.Plugins {
 		client.WriterConfig(fmt.Sprintf(" %s\n", plugin))
 	}
@@ -83,7 +87,7 @@ func (client *TwitchClient) WriteCurrentConfigs() {
 func (client *TwitchClient) StartBot(uiStarted chan struct{}) error {
 	// wait for UI to start
 	<-uiStarted
-	//time.Sleep(250 * time.Millisecond)
+
 	// write configuratons
 	client.WriteCurrentConfigs()
 	err := client.ConnectChannel()
@@ -94,6 +98,25 @@ func (client *TwitchClient) StartBot(uiStarted chan struct{}) error {
 	client.ReadChat()
 
 	return nil
+}
+
+func (client *TwitchClient) ReloadConfig(uiStarted chan struct{}, irl, channel string, debug bool) {
+	client.Debug = debug
+	reconnect := false
+	if client.TwitchIRL != irl {
+		reconnect = true
+		client.TwitchIRL = irl
+	}
+	if client.Channel != channel {
+		reconnect = true
+		client.Channel = channel
+	}
+	// reconnect if necessary
+	if reconnect {
+		client.Close()
+		uiStarted <- struct{}{}
+		go client.StartBot(uiStarted)
+	}
 }
 
 // ConnectChannel create connection to IRC server and join Channel
@@ -107,7 +130,11 @@ func (client *TwitchClient) ConnectChannel() error {
 	// join channel
 	// client.WriterMain(fmt.Sprintf("Joinning Channel %s\n", client.Channel))
 	client.WriterCmd(fmt.Sprintf("Joinning Channel %s\n", client.Channel))
-	fmt.Fprintf(client.Conn, "PASS %s\r\nNICK %s\r\nJOIN #%s\r\n", "justinfan6493", "justinfan6493", client.Channel)
+	fmt.Fprintf(
+		client.Conn,
+		"PASS %s\r\nNICK %s\r\nJOIN #%s\r\n", "justinfan6493", "justinfan6493",
+		client.Channel,
+	)
 
 	chatBuffer := bufio.NewReader(client.Conn)
 	for connecting := true; connecting; {

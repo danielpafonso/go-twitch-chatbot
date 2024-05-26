@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
+	"time"
 
 	"twitch-chatbot/internal/configurations"
 	"twitch-chatbot/internal/twitch"
@@ -31,9 +33,6 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
-	// set file watchdog
-	go configurations.FileWatch(configsPath, configs.Reload)
-
 	// log.Println("Loading Commands macros")
 	// plugins := LoadCommands()
 	// client.ReadChat(plugins)
@@ -55,6 +54,28 @@ func main() {
 
 	// start twitch client
 	go client.StartBot(uiStarted)
+
+	// config watchdog
+	go func() {
+		oldStat, _ := os.Stat(configsPath)
+		for {
+			stat, _ := os.Stat(configsPath)
+			if oldStat.ModTime() != stat.ModTime() {
+				// reload file
+				if changed := configs.Reload(configsPath); changed {
+					// reload twitch client
+					client.ReloadConfig(
+						uiStarted,
+						configs.TwitchIRL,
+						configs.Channel,
+						configs.Debug,
+					)
+				}
+				oldStat = stat
+			}
+			time.Sleep(time.Second)
+		}
+	}()
 
 	// start graphica interface
 	mainUI.Start(uiStarted)
