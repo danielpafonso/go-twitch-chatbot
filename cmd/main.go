@@ -2,11 +2,13 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"twitch-chatbot/internal/configurations"
+	"twitch-chatbot/internal/plugins"
 	"twitch-chatbot/internal/twitch"
 	"twitch-chatbot/internal/ui"
 )
@@ -33,7 +35,19 @@ func main() {
 	if err != nil {
 		log.Panicln(err)
 	}
-	// log.Println("Loading Commands macros")
+
+	fmt.Printf("%+v\n", configs)
+
+	log.Println("Loading messages filters")
+	plugins.LoadFilter(configs.Filters)
+	filters := plugins.FilterMap
+
+	log.Println("testing phase: 'Hello from another world'")
+	log.Println(filters["StartsWith"].Apply("Hello from another world"))
+	log.Println("testing phase: 'In twitch chat there are many Joels'")
+	log.Println(filters["Contains"].Apply("In twitch chat there are many Joels"))
+	log.Println("Loading Commands macros")
+
 	// plugins := LoadCommands()
 	// client.ReadChat(plugins)
 
@@ -49,6 +63,8 @@ func main() {
 		mainUI.WriteMain,
 		mainUI.WriteCmd,
 		mainUI.WriteSide,
+		make([]string, 0),
+		filters,
 	)
 	defer client.Close()
 

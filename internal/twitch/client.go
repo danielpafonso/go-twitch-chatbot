@@ -8,6 +8,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"twitch-chatbot/internal/plugins"
 )
 
 type TwitchClient struct {
@@ -19,6 +21,7 @@ type TwitchClient struct {
 	WriterCmd    func(string)
 	WriterConfig func(string, ...bool)
 	Plugins      []string
+	Filters      map[string]plugins.Filter
 }
 
 type chatMsg struct {
@@ -29,7 +32,15 @@ type chatMsg struct {
 }
 
 // NewClient creates a Twitch Client and sets desired configurations
-func NewClient(irl, channel string, debug bool, writerMain func(string), writerCmd func(string), writerConfig func(string, ...bool)) *TwitchClient {
+func NewClient(
+	irl, channel string,
+	debug bool,
+	writerMain func(string),
+	writerCmd func(string),
+	writerConfig func(string, ...bool),
+	plugins []string,
+	filters map[string]plugins.Filter,
+) *TwitchClient {
 	client := TwitchClient{
 		TwitchIRL:    irl,
 		Channel:      channel,
@@ -37,7 +48,8 @@ func NewClient(irl, channel string, debug bool, writerMain func(string), writerC
 		WriterMain:   writerMain,
 		WriterCmd:    writerCmd,
 		WriterConfig: writerConfig,
-		Plugins:      make([]string, 0),
+		Plugins:      plugins,
+		Filters:      filters,
 	}
 	return &client
 }
@@ -194,6 +206,10 @@ func (client *TwitchClient) ReadChat() {
 			// get user
 			user := parsedMsg.source[1:strings.Index(parsedMsg.source, "!")]
 			client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
+			for name, filter := range client.Filters {
+				check := filter.Apply(parsedMsg.message)
+				client.WriterCmd(fmt.Sprintf("filter %s: %v\n", name, check))
+			}
 		case "001":
 			// Logged in (successfully authenticated).
 			fallthrough
