@@ -205,10 +205,16 @@ func (client *TwitchClient) ReadChat() {
 		case "PRIVMSG":
 			// get user
 			user := parsedMsg.source[1:strings.Index(parsedMsg.source, "!")]
-			client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
+			filtered := false
 			for name, filter := range client.Filters {
 				check := filter.Apply(parsedMsg.message)
 				client.WriterCmd(fmt.Sprintf("filter %s: %v\n", name, check))
+				filtered = filtered || check
+			}
+			if filtered {
+				client.WriterMain(fmt.Sprintf("%s:> \033[32;2m%s\033[0m\n", user, parsedMsg.message))
+			} else {
+				client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
 			}
 		case "001":
 			// Logged in (successfully authenticated).
