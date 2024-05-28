@@ -206,9 +206,8 @@ func (client *TwitchClient) ReadChat() {
 			// get user
 			user := parsedMsg.source[1:strings.Index(parsedMsg.source, "!")]
 			filtered := false
-			for name, filter := range client.Filters {
+			for _, filter := range client.Filters {
 				check := filter.Apply(parsedMsg.message)
-				client.WriterCmd(fmt.Sprintf("filter %s: %v\n", name, check))
 				filtered = filtered || check
 			}
 			if filtered {
