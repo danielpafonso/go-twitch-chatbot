@@ -17,9 +17,3 @@ The following tables show the rate limits for the number of messages that your b
 | --- | --- |
 |20 messages per 30 seconds | If the user isn’t the channel’s broadcaster or moderator, the bot may send a maximum of 20 messages per 30 seconds. |
 |100 messages per 30 seconds | If the user is the channel’s broadcaster or moderator, the bot may send a maximum of 100 messages per 30 seconds. |
-
-[Twitch chat docs](https://dev.twitch.tv/docs/irc/)  
-[How to build websockets in Go](https://yalantis.com/blog/how-to-build-websockets-in-go/)  
-[reader with timeout](https://gist.github.com/hongster/04660a20f2498fb7b680)
-
-[golang console user interface](https://github.com/jroimartin/gocui)
