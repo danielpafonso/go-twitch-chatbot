@@ -211,7 +211,7 @@ func (client *TwitchClient) ReadChat() {
 				filtered = filtered || check
 			}
 			if filtered {
-				client.WriterMain(fmt.Sprintf("%s:> \033[32;2m%s\033[0m\n", user, parsedMsg.message))
+				client.WriterMain(fmt.Sprintf("%s:> \033[32;1m%s\033[0m\n", user, parsedMsg.message))
 			} else {
 				client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
 			}
