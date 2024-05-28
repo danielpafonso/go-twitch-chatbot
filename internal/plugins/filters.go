@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"fmt"
+	"log"
 	"strings"
 )
 
@@ -45,7 +45,7 @@ func LoadFilter(filterConfigs []FilterConfig) {
 			case "Contains":
 				FilterMap[config.Name] = &ContainsFilter{Pattern: config.Pattern}
 			default:
-				fmt.Printf("Unknowed filter: %s\n", config.Name)
+				log.Printf("Unknowed filter: %s\n", config.Name)
 			}
 		}
 	}
