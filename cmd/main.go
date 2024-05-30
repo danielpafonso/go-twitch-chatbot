@@ -42,14 +42,8 @@ func main() {
 	plugins.LoadFilter(configs.Filters)
 	filters := plugins.FilterMap
 
-	log.Println("testing phase: 'Hello from another world'")
-	log.Println(filters["StartsWith"].Apply("Hello from another world"))
-	log.Println("testing phase: 'In twitch chat there are many Joels'")
-	log.Println(filters["Contains"].Apply("In twitch chat there are many Joels"))
 	log.Println("Loading Commands macros")
-
-	// plugins := LoadCommands()
-	// client.ReadChat(plugins)
+	commands := plugins.LoadCommands(configs.Commands)
 
 	// create ui configs
 	mainUI := ui.NewUI(titleView, banner)
@@ -63,7 +57,7 @@ func main() {
 		mainUI.WriteMain,
 		mainUI.WriteCmd,
 		mainUI.WriteSide,
-		make([]string, 0),
+		commands,
 		filters,
 	)
 	defer client.Close()

@@ -9,10 +9,11 @@ import (
 )
 
 type TwitchConfigs struct {
-	TwitchIRL string                 `json:"twicthIrc"`
-	Channel   string                 `json:"channel"`
-	Debug     bool                   `json:"debug"`
-	Filters   []plugins.FilterConfig `json:"filter"`
+	TwitchIRL string                  `json:"twicthIrc"`
+	Channel   string                  `json:"channel"`
+	Debug     bool                    `json:"debug"`
+	Filters   []plugins.FilterConfig  `json:"filter"`
+	Commands  []plugins.CommandConfig `json:"commands"`
 }
 
 // Load reads and parse configuration json file

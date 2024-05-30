@@ -6,9 +6,9 @@ import (
 )
 
 type CommandConfig struct {
-	Name    string
-	Enable  bool
-	Trigger string
+	Name    string `json:"name"`
+	Enable  bool   `json:"enable"`
+	Trigger string `json:"trigger"`
 }
 
 type Command interface {
