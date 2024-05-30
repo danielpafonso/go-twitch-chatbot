@@ -226,7 +226,7 @@ func (client *TwitchClient) ReadChat() {
 			if strings.HasPrefix(parsedMsg.message, "!") {
 				if cmd, ok := client.Commands[strings.TrimPrefix(parsedMsg.message, "!")]; ok {
 					client.WriterCmd(
-						fmt.Sprintf("cmd: \033[33;1m%s\033[0m\n", cmd.Execute("asdasd")),
+						fmt.Sprintf("cmd: \033[33;1m%s\033[0m\n", cmd.Execute(parsedMsg.message)),
 					)
 				}
 			}
