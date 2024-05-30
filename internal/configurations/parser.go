@@ -56,5 +56,49 @@ func (config *TwitchConfigs) Reload(filepath string) bool {
 		config.Debug = newConfig.Debug
 		changes = true
 	}
+	// check for changes in Commands
+	for _, nwCfg := range newConfig.Commands {
+		new := true
+		for i, cfg := range config.Commands {
+			if nwCfg.Name == cfg.Name {
+				new = false
+				if nwCfg.Enable != cfg.Enable {
+					config.Commands[i].Enable = nwCfg.Enable
+					changes = true
+				}
+				if nwCfg.Trigger != cfg.Trigger {
+					config.Commands[i].Trigger = nwCfg.Trigger
+					changes = true
+				}
+				break
+			}
+		}
+		if new {
+			config.Commands = append(config.Commands, nwCfg)
+			changes = true
+		}
+	}
+	// check for changes in Filters
+	for _, nwCfg := range newConfig.Filters {
+		new := true
+		for i, cfg := range config.Filters {
+			if nwCfg.Name == cfg.Name {
+				new = false
+				if nwCfg.Enable != cfg.Enable {
+					config.Filters[i].Enable = nwCfg.Enable
+					changes = true
+				}
+				if nwCfg.Pattern != cfg.Pattern {
+					config.Filters[i].Pattern = nwCfg.Pattern
+					changes = true
+				}
+				break
+			}
+		}
+		if new {
+			config.Filters = append(config.Filters, nwCfg)
+			changes = true
+		}
+	}
 	return changes
 }

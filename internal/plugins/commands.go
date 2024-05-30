@@ -37,7 +37,7 @@ func (cmd *uptimeCommand) Execute(_ string) string {
 }
 
 func LoadCommands(configs []CommandConfig) CommandMap {
-	output := make(CommandMap, 0)
+	output := make(CommandMap)
 
 	for _, config := range configs {
 		if config.Enable {

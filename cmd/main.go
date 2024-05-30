@@ -39,8 +39,7 @@ func main() {
 	fmt.Printf("%+v\n", configs)
 
 	log.Println("Loading messages filters")
-	plugins.LoadFilter(configs.Filters)
-	filters := plugins.FilterMap
+	filters := plugins.LoadFilter(configs.Filters)
 
 	log.Println("Loading Commands macros")
 	commands := plugins.LoadCommands(configs.Commands)
@@ -72,7 +71,10 @@ func main() {
 			stat, _ := os.Stat(configsPath)
 			if oldStat.ModTime() != stat.ModTime() {
 				// reload file
+				client.WriterMain(fmt.Sprintf("\n%+v\n", configs))
 				if changed := configs.Reload(configsPath); changed {
+					client.WriterMain("reloading configs\n")
+					client.WriterMain(fmt.Sprintf("%+v\n", configs))
 					// reload twitch client
 					client.ReloadConfig(
 						uiStarted,
@@ -80,6 +82,11 @@ func main() {
 						configs.Channel,
 						configs.Debug,
 					)
+					// reload plugins
+					client.Commands = plugins.LoadCommands(configs.Commands)
+					client.Filters = plugins.LoadFilter(configs.Filters)
+					// update prints
+					client.WriteCurrentConfigs()
 				}
 				oldStat = stat
 			}

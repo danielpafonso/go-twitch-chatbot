@@ -15,7 +15,7 @@ type Filter interface {
 	Apply(string) bool
 }
 
-var FilterMap map[string]Filter
+type FilterMap map[string]Filter
 
 // Starts With Filter
 type startsFilter struct {
@@ -35,18 +35,19 @@ func (filter *ContainsFilter) Apply(data string) bool {
 	return strings.Contains(data, filter.Pattern)
 }
 
-func LoadFilter(filterConfigs []FilterConfig) {
-	FilterMap = make(map[string]Filter)
+func LoadFilter(filterConfigs []FilterConfig) FilterMap {
+	output := make(FilterMap)
 	for _, config := range filterConfigs {
 		if config.Enable {
 			switch config.Name {
 			case "StartsWith":
-				FilterMap[config.Name] = &startsFilter{Pattern: config.Pattern}
+				output[config.Name] = &startsFilter{Pattern: config.Pattern}
 			case "Contains":
-				FilterMap[config.Name] = &ContainsFilter{Pattern: config.Pattern}
+				output[config.Name] = &ContainsFilter{Pattern: config.Pattern}
 			default:
 				log.Printf("Unknowed filter: %s\n", config.Name)
 			}
 		}
 	}
+	return output
 }
