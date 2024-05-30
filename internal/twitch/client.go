@@ -96,8 +96,8 @@ func (client *TwitchClient) WriteCurrentConfigs() {
 		client.WriterConfig(fmt.Sprintf(" %s\n", name))
 	}
 	client.WriterConfig("\nEnabled Filter:\n")
-	for name := range client.Filters {
-		client.WriterConfig(fmt.Sprintf(" %s\n", name))
+	for name, cmd := range client.Filters {
+		client.WriterConfig(fmt.Sprintf(" %s\n   Ptr: %s\n\n", name, cmd.GetPattern()))
 	}
 }
 

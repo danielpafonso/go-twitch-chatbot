@@ -13,6 +13,7 @@ type FilterConfig struct {
 
 type Filter interface {
 	Apply(string) bool
+	GetPattern() string
 }
 
 type FilterMap map[string]Filter
@@ -25,14 +26,20 @@ type startsFilter struct {
 func (filter *startsFilter) Apply(data string) bool {
 	return strings.HasPrefix(data, filter.Pattern)
 }
+func (filter *startsFilter) GetPattern() string {
+	return filter.Pattern
+}
 
 // Contains Filter
-type ContainsFilter struct {
+type containsFilter struct {
 	Pattern string
 }
 
-func (filter *ContainsFilter) Apply(data string) bool {
+func (filter *containsFilter) Apply(data string) bool {
 	return strings.Contains(data, filter.Pattern)
+}
+func (filter *containsFilter) GetPattern() string {
+	return filter.Pattern
 }
 
 func LoadFilter(filterConfigs []FilterConfig) FilterMap {
@@ -43,7 +50,7 @@ func LoadFilter(filterConfigs []FilterConfig) FilterMap {
 			case "StartsWith":
 				output[config.Name] = &startsFilter{Pattern: config.Pattern}
 			case "Contains":
-				output[config.Name] = &ContainsFilter{Pattern: config.Pattern}
+				output[config.Name] = &containsFilter{Pattern: config.Pattern}
 			default:
 				log.Printf("Unknowed filter: %s\n", config.Name)
 			}

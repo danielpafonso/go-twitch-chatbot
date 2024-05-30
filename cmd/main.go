@@ -71,10 +71,7 @@ func main() {
 			stat, _ := os.Stat(configsPath)
 			if oldStat.ModTime() != stat.ModTime() {
 				// reload file
-				client.WriterMain(fmt.Sprintf("\n%+v\n", configs))
 				if changed := configs.Reload(configsPath); changed {
-					client.WriterMain("reloading configs\n")
-					client.WriterMain(fmt.Sprintf("%+v\n", configs))
 					// reload twitch client
 					client.ReloadConfig(
 						uiStarted,
