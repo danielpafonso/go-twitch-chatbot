@@ -20,7 +20,7 @@ type TwitchClient struct {
 	WriterMain   func(string)
 	WriterCmd    func(string)
 	WriterConfig func(string, ...bool)
-	Plugins      []string
+	Commands     map[string]plugins.Command
 	Filters      map[string]plugins.Filter
 }
 
@@ -38,7 +38,7 @@ func NewClient(
 	writerMain func(string),
 	writerCmd func(string),
 	writerConfig func(string, ...bool),
-	plugins []string,
+	commands map[string]plugins.Command,
 	filters map[string]plugins.Filter,
 ) *TwitchClient {
 	client := TwitchClient{
@@ -48,7 +48,7 @@ func NewClient(
 		WriterMain:   writerMain,
 		WriterCmd:    writerCmd,
 		WriterConfig: writerConfig,
-		Plugins:      plugins,
+		Commands:     commands,
 		Filters:      filters,
 	}
 	return &client
@@ -91,8 +91,13 @@ func (client *TwitchClient) WriteCurrentConfigs() {
 		),
 		true,
 	)
-	for _, plugin := range client.Plugins {
-		client.WriterConfig(fmt.Sprintf(" %s\n", plugin))
+	client.WriterConfig("Enabled Commands:\n")
+	for name := range client.Commands {
+		client.WriterConfig(fmt.Sprintf(" %s\n", name))
+	}
+	client.WriterConfig("\nEnabled Filter:\n")
+	for name, cmd := range client.Filters {
+		client.WriterConfig(fmt.Sprintf(" %s\n   Ptr: %s\n\n", name, cmd.GetPattern()))
 	}
 }
 
@@ -196,7 +201,6 @@ func (client *TwitchClient) ReadChat() {
 			connected = false
 		}
 		parsedMsg := parseMessage(string(bytes))
-		// client.WriterMain(fmt.Sprintf("%+v\n", parsedMsg))
 		switch parsedMsg.command {
 		case "PING":
 			// respond with PONG
@@ -205,15 +209,26 @@ func (client *TwitchClient) ReadChat() {
 		case "PRIVMSG":
 			// get user
 			user := parsedMsg.source[1:strings.Index(parsedMsg.source, "!")]
+
+			// filter message
 			filtered := false
 			for _, filter := range client.Filters {
 				check := filter.Apply(parsedMsg.message)
 				filtered = filtered || check
 			}
 			if filtered {
-				client.WriterMain(fmt.Sprintf("%s:> \033[32;2m%s\033[0m\n", user, parsedMsg.message))
+				client.WriterMain(fmt.Sprintf("%s:> \033[32;1m%s\033[0m\n", user, parsedMsg.message))
 			} else {
 				client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
+			}
+
+			// check if command
+			if strings.HasPrefix(parsedMsg.message, "!") {
+				if cmd, ok := client.Commands[strings.TrimPrefix(parsedMsg.message, "!")]; ok {
+					client.WriterCmd(
+						fmt.Sprintf("cmd: \033[33;1m%s\033[0m\n", cmd.Execute(parsedMsg.message)),
+					)
+				}
 			}
 		case "001":
 			// Logged in (successfully authenticated).

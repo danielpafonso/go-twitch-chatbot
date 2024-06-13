@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"fmt"
+	"log"
 	"strings"
 )
 
@@ -13,9 +13,10 @@ type FilterConfig struct {
 
 type Filter interface {
 	Apply(string) bool
+	GetPattern() string
 }
 
-var FilterMap map[string]Filter
+type FilterMap map[string]Filter
 
 // Starts With Filter
 type startsFilter struct {
@@ -25,28 +26,35 @@ type startsFilter struct {
 func (filter *startsFilter) Apply(data string) bool {
 	return strings.HasPrefix(data, filter.Pattern)
 }
+func (filter *startsFilter) GetPattern() string {
+	return filter.Pattern
+}
 
 // Contains Filter
-type ContainsFilter struct {
+type containsFilter struct {
 	Pattern string
 }
 
-func (filter *ContainsFilter) Apply(data string) bool {
+func (filter *containsFilter) Apply(data string) bool {
 	return strings.Contains(data, filter.Pattern)
 }
+func (filter *containsFilter) GetPattern() string {
+	return filter.Pattern
+}
 
-func LoadFilter(filterConfigs []FilterConfig) {
-	FilterMap = make(map[string]Filter)
+func LoadFilter(filterConfigs []FilterConfig) FilterMap {
+	output := make(FilterMap)
 	for _, config := range filterConfigs {
 		if config.Enable {
 			switch config.Name {
 			case "StartsWith":
-				FilterMap[config.Name] = &startsFilter{Pattern: config.Pattern}
+				output[config.Name] = &startsFilter{Pattern: config.Pattern}
 			case "Contains":
-				FilterMap[config.Name] = &ContainsFilter{Pattern: config.Pattern}
+				output[config.Name] = &containsFilter{Pattern: config.Pattern}
 			default:
-				fmt.Printf("Unknowed filter: %s\n", config.Name)
+				log.Printf("Unknowed filter: %s\n", config.Name)
 			}
 		}
 	}
+	return output
 }
