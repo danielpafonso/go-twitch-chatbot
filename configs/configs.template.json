@@ -1,16 +1,16 @@
 {
-    "twicthIrc": "irc://irc.chat.twitch.tv:6667",
-    "channel": "channel",
-    "filter": [
-        {
-            "name": "StartsWith",
-            "enable": false,
-            "pattern": "starts"
-        },
-        {
-            "name": "Contains",
-            "enable": false,
-            "pattern": "substring"
-        }
-    ]
+  "twicthIrc": "irc://irc.chat.twitch.tv:6667",
+  "channel": "channel",
+  "filter": [
+    {
+      "name": "StartsWith",
+      "enable": false,
+      "pattern": "starts"
+    },
+    {
+      "name": "Contains",
+      "enable": false,
+      "pattern": "substring"
+    }
+  ]
 }

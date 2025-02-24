@@ -1,10 +1,11 @@
 # Go Twicth Chatbot
 
+Twitch Chat Reader bot that enables to filter and reaction to commands
+
 |             | WebSocket clients               | IRC clients                   |
 | ----------- | ------------------------------- | ----------------------------- |
 | **SSL**     | wss://irc-ws.chat.twitch.tv:443 | irc://irc.chat.twitch.tv:6697 |
 | **Non SSL** | ws://irc-ws.chat.twitch.tv:80   | irc://irc.chat.twitch.tv:6667 |
-
 
 # Rate limits
 
@@ -13,7 +14,7 @@ Command and message rate limits
 
 The following tables show the rate limits for the number of messages that your bot may send. If you exceed these limits, Twitch ignores the bots messages for the next 30 minutes.
 
-| Limit | Description |
-| --- | --- |
-|20 messages per 30 seconds | If the user isn’t the channel’s broadcaster or moderator, the bot may send a maximum of 20 messages per 30 seconds. |
-|100 messages per 30 seconds | If the user is the channel’s broadcaster or moderator, the bot may send a maximum of 100 messages per 30 seconds. |
+| Limit                       | Description                                                                                                         |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 20 messages per 30 seconds  | If the user isn’t the channel’s broadcaster or moderator, the bot may send a maximum of 20 messages per 30 seconds. |
+| 100 messages per 30 seconds | If the user is the channel’s broadcaster or moderator, the bot may send a maximum of 100 messages per 30 seconds.   |
