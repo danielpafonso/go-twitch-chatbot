@@ -1,17 +1,20 @@
-.PHONY : build clean debug
+.PHONY : build clean debug test
+
+all: clean copy build
 
 build: clean
-	@echo "Build Application"
-	mkdir -p build
-	## Build chatbot executable
+	@mkdir -p build
 	CGO_ENABLED=0 go build -trimpath -a -ldflags '-w -s' -o ./build/chatbot ./cmd/
-	## Copy default configuirations to build folder
-	cp configs/configs.template.json build/configs.json
-	@echo "Done"
 
 clean:
-	@echo "Clean build folder"
 	rm -rf build/*
+
+copy:
+	@mkdir -p build
+	cp configs/configs.template.json build/configs.json
 
 debug:
 	go run ./cmd/ -c configs/debug.json 
+
+test:
+	go test -v ./...
