@@ -2,7 +2,7 @@
 
 all: clean copy build
 
-build: clean
+build:
 	@mkdir -p build
 	CGO_ENABLED=0 go build -trimpath -a -ldflags '-w -s' -o ./build/chatbot ./cmd/
 
