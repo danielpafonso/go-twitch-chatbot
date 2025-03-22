@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
@@ -145,7 +146,6 @@ func (client *TwitchClient) ConnectChannel() error {
 		return err
 	}
 	// join channel
-	// client.WriterMain(fmt.Sprintf("Joinning Channel %s\n", client.Channel))
 	client.WriterCmd(fmt.Sprintf("Joinning Channel %s\n", client.Channel))
 	fmt.Fprintf(
 		client.Conn,
@@ -197,6 +197,9 @@ func (client *TwitchClient) ReadChat() {
 			if errors.Is(err, net.ErrClosed) {
 				return
 			}
+			if errors.Is(err, io.EOF) {
+				return
+			}
 			client.WriterMain(fmt.Sprintf("ERROR[%T] %s\n", err, err))
 			connected = false
 		}
@@ -204,7 +207,7 @@ func (client *TwitchClient) ReadChat() {
 		switch parsedMsg.command {
 		case "PING":
 			// respond with PONG
-			pong := fmt.Sprintf("PONG %s", parsedMsg.subcommand)
+			pong := fmt.Sprintf("PONG %s\r\n", parsedMsg.subcommand)
 			client.Conn.Write([]byte(pong))
 		case "PRIVMSG":
 			// get user
