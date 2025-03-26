@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"testing"
-	"twitch-chatbot/internal/plugins"
 )
 
 // TestLoadFile calls configuration load
@@ -46,14 +45,14 @@ func TestReload(t *testing.T) {
 	testConfig := TwitchConfigs{
 		TwitchIRL: "irc://twitch.irl.com",
 		Channel:   "qwe",
-		Commands: []plugins.CommandConfig{
+		Commands: []CommandConfig{
 			{
 				Name:    "",
 				Enable:  true,
 				Trigger: "",
 			},
 		},
-		Filters: []plugins.FilterConfig{
+		Filters: []FilterConfig{
 			{
 				Name:    "",
 				Enable:  true,
@@ -95,7 +94,7 @@ func TestReload(t *testing.T) {
 		}
 	})
 	t.Run("Commands", func(t *testing.T) {
-		currentConfig.Commands = make([]plugins.CommandConfig, 0)
+		currentConfig.Commands = make([]CommandConfig, 0)
 		t.Run("NewConfig", func(t *testing.T) {
 			changes := currentConfig.Reload(tf.Name())
 			if changes == false {
@@ -130,7 +129,7 @@ func TestReload(t *testing.T) {
 	})
 
 	t.Run("Filter", func(t *testing.T) {
-		currentConfig.Filters = make([]plugins.FilterConfig, 0)
+		currentConfig.Filters = make([]FilterConfig, 0)
 		t.Run("NewFilter", func(t *testing.T) {
 			changes := currentConfig.Reload(tf.Name())
 			if changes == false {

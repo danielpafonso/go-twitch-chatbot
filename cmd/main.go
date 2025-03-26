@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"twitch-chatbot/internal/configurations"
-	"twitch-chatbot/internal/plugins"
 	"twitch-chatbot/internal/twitch"
 	"twitch-chatbot/internal/ui"
+	"twitch-chatbot/plugins"
 )
 
 var (
@@ -38,11 +38,15 @@ func main() {
 
 	fmt.Printf("%+v\n", configs)
 
-	log.Println("Loading messages filters")
-	filters := plugins.LoadFilter(configs.Filters)
-
+	// log.Println("Loading messages filters")
+	// filters := plugins.LoadFilter(configs.Filters)
+	//
 	log.Println("Loading Commands macros")
-	commands := plugins.LoadCommands(configs.Commands)
+	commands, err := plugins.LoadPluginsCommands(configs.Commands, "plugins")
+	if err != nil {
+		log.Panic(err)
+	}
+	// commands := plugins.LoadCommands(configs.Commands)
 
 	// create ui configs
 	mainUI := ui.NewUI(titleView, banner)
@@ -57,7 +61,8 @@ func main() {
 		mainUI.WriteCmd,
 		mainUI.WriteSide,
 		commands,
-		filters,
+		// filters,
+		nil,
 	)
 	defer client.Close()
 
@@ -80,8 +85,11 @@ func main() {
 						configs.Debug,
 					)
 					// reload plugins
-					client.Commands = plugins.LoadCommands(configs.Commands)
-					client.Filters = plugins.LoadFilter(configs.Filters)
+					client.Commands, err = plugins.LoadPluginsCommands(configs.Commands, "plugins")
+					if err != nil {
+						log.Panic(err)
+					}
+					// client.Filters = plugins.LoadFilter(configs.Filters)
 					// update prints
 					client.WriteCurrentConfigs()
 				}

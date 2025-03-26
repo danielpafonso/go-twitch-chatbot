@@ -167,20 +167,17 @@ func TestMessageClient(t *testing.T) {
 		}
 		// work
 		buffReader := bufio.NewReader(conn)
-		// buffWriter := bufio.NewWriter(conn)
 		defer conn.Close()
 		// send single message
 		fmt.Fprint(
 			conn,
 			":user!user@user.tmi.twitch.tv PRIVMSG #channel :this is a message\r\n",
 		)
-		// time.Sleep(time.Millisecond * 100)
 		// send Ping heartbeat
 		fmt.Fprint(conn, "PING :tmi.twitch.tv\r\n")
 		time.Sleep(time.Second)
 		conn.SetReadDeadline(time.Now().Add(time.Second * 5))
 		bytes, err := buffReader.ReadBytes('\n')
-		// bytes, _, err := buffReader.ReadLine()
 		if err != nil {
 			switch {
 			//case timeout
@@ -200,7 +197,6 @@ func TestMessageClient(t *testing.T) {
 	}("localhost", "8889")
 
 	// create client
-	// mainBuffer := make([]string, 0)
 	mainBuffer := uiBuffer{data: make([]string, 0)}
 	cmdBuffer := uiBuffer{data: make([]string, 0)}
 	client := TwitchClient{
@@ -216,7 +212,7 @@ func TestMessageClient(t *testing.T) {
 		panic(err)
 	}
 	client.ReadChat()
-	// assert
+	// assert buffers
 	if len(mainBuffer.data) != 1 {
 		t.Fail()
 	}

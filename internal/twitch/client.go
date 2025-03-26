@@ -10,7 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"twitch-chatbot/internal/plugins"
+	// "twitch-chatbot/internal/plugins"
+	"twitch-chatbot/plugins"
 )
 
 type TwitchClient struct {
@@ -21,8 +22,8 @@ type TwitchClient struct {
 	WriterMain   func(string)
 	WriterCmd    func(string)
 	WriterConfig func(string, ...bool)
-	Commands     map[string]plugins.Command
-	Filters      map[string]plugins.Filter
+	Commands     plugins.CommandMap
+	Filters      plugins.FilterMap
 }
 
 type chatMsg struct {
@@ -96,10 +97,10 @@ func (client *TwitchClient) WriteCurrentConfigs() {
 	for name := range client.Commands {
 		client.WriterConfig(fmt.Sprintf(" %s\n", name))
 	}
-	client.WriterConfig("\nEnabled Filter:\n")
-	for name, cmd := range client.Filters {
-		client.WriterConfig(fmt.Sprintf(" %s\n   Ptr: %s\n\n", name, cmd.GetPattern()))
-	}
+	// client.WriterConfig("\nEnabled Filter:\n")
+	// for name, cmd := range client.Filters {
+	// 	client.WriterConfig(fmt.Sprintf(" %s\n   Ptr: %s\n\n", name, cmd.GetPattern()))
+	// }
 }
 
 func (client *TwitchClient) StartBot(uiStarted chan struct{}) error {
@@ -212,25 +213,30 @@ func (client *TwitchClient) ReadChat() {
 		case "PRIVMSG":
 			// get user
 			user := parsedMsg.source[1:strings.Index(parsedMsg.source, "!")]
+			client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
 
 			// filter message
-			filtered := false
-			for _, filter := range client.Filters {
-				check := filter.Apply(parsedMsg.message)
-				filtered = filtered || check
-			}
-			if filtered {
-				client.WriterMain(fmt.Sprintf("%s:> \033[32;1m%s\033[0m\n", user, parsedMsg.message))
-			} else {
-				client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
-			}
+			// filtered := false
+			// for _, filter := range client.Filters {
+			// 	check := filter.Apply(parsedMsg.message)
+			// 	filtered = filtered || check
+			// }
+			// if filtered {
+			// 	client.WriterMain(fmt.Sprintf("%s:> \033[32;1m%s\033[0m\n", user, parsedMsg.message))
+			// } else {
+			// 	client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
+			// }
 
 			// check if command
 			if strings.HasPrefix(parsedMsg.message, "!") {
 				if cmd, ok := client.Commands[strings.TrimPrefix(parsedMsg.message, "!")]; ok {
+					result, _ := cmd.Execute(parsedMsg.message)
 					client.WriterCmd(
-						fmt.Sprintf("cmd: \033[33;1m%s\033[0m\n", cmd.Execute(parsedMsg.message)),
+						fmt.Sprintf("cmd: \033[33;1m%s\033[0m\n", result),
 					)
+					// client.WriterCmd(
+					// 	fmt.Sprintf("cmd: \033[33;1m%s\033[0m\n", cmd.Execute(parsedMsg.message)),
+					// )
 				}
 			}
 		case "001":

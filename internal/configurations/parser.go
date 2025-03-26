@@ -4,16 +4,14 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
-
-	"twitch-chatbot/internal/plugins"
 )
 
 type TwitchConfigs struct {
-	TwitchIRL string                  `json:"twicthIrc"`
-	Channel   string                  `json:"channel"`
-	Debug     bool                    `json:"debug"`
-	Filters   []plugins.FilterConfig  `json:"filter"`
-	Commands  []plugins.CommandConfig `json:"commands"`
+	TwitchIRL string          `json:"twicthIrc"`
+	Channel   string          `json:"channel"`
+	Debug     bool            `json:"debug"`
+	Filters   []FilterConfig  `json:"filter"`
+	Commands  []CommandConfig `json:"commands"`
 }
 
 // Load reads and parse configuration json file
