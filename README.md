@@ -18,3 +18,5 @@ The following tables show the rate limits for the number of messages that your b
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
 | 20 messages per 30 seconds  | If the user isn’t the channel’s broadcaster or moderator, the bot may send a maximum of 20 messages per 30 seconds. |
 | 100 messages per 30 seconds | If the user is the channel’s broadcaster or moderator, the bot may send a maximum of 100 messages per 30 seconds.   |
+
+laksdjlaksdj
