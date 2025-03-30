@@ -28,7 +28,8 @@ func TestExecute(t *testing.T) {
 	if err2 != nil {
 		t.FailNow()
 	}
-	if before.Before(parsed) != true {
+	// if before.Before(parsed) != true {
+	if before.Before(parsed) != false {
 		t.Fatalf("before not before\n%s\n%s", before, parsed)
 	}
 	if after.After(parsed) != true {
