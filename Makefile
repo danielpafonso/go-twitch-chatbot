@@ -8,14 +8,13 @@ build: app plugin
 app:
 	@mkdir -p build
 	go build ${FLAGS} -o ./build/chatbot ./cmd/
-# CGO_ENABLED=0 go build ${FLAGS} -o ./build/chatbot ./cmd/
 
 plugin: 
 	@mkdir -p build/plugins
 	find plugins/commands/* -maxdepth 1 -type d -print0 | xargs -0 -I {} \
 		sh -c 'd="$$(basename {})"; go build -buildmode=plugin $(FLAGS) -o ./build/plugins/"$$d".so ./{}/'
-# find plugins/filters/* -maxdepth 1 -type d -print0 | xargs -0 -I {} \
-# 	sh -c 'd="$$(basename {})"; go build -buildmode=plugin $(FLAGS) -o ./build/plugins/"$$d".so ./{}/'
+	find plugins/filters/* -maxdepth 1 -type d -print0 | xargs -0 -I {} \
+		sh -c 'd="$$(basename {})"; go build -buildmode=plugin $(FLAGS) -o ./build/plugins/"$$d".so ./{}/'
 
 clean:
 	rm -rf build/*
