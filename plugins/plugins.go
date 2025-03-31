@@ -2,7 +2,6 @@ package plugins
 
 import (
 	"errors"
-	"fmt"
 	"path"
 	"plugin"
 
@@ -18,7 +17,8 @@ type Command interface {
 // Functions that filter plugins must implement
 type Filter interface {
 	Initiate(args ...interface{}) error
-	Apply(line string) (string, error)
+	GetPattern() string
+	Apply(line string) (bool, error)
 }
 
 type CommandMap map[string]Command
@@ -31,7 +31,6 @@ func LoadPluginsCommands(configs []configurations.CommandConfig, pluginFolder st
 		if !config.Enable {
 			continue
 		}
-		fmt.Printf("loading %s with trigger %s\n", config.Name, config.Trigger)
 		pluginObject := path.Join("", pluginFolder, config.Name+".so")
 		// read file
 		plug, err := plugin.Open(pluginObject)
@@ -61,8 +60,36 @@ func LoadPluginsCommands(configs []configurations.CommandConfig, pluginFolder st
 }
 
 // LoadPluginsFilter load and configure commands plugins
-func LoadPluginsFilter(configs configurations.FilterConfig, pluginFolder string) (FilterMap, error) {
+func LoadPluginsFilter(configs []configurations.FilterConfig, pluginFolder string) (FilterMap, error) {
 	filterMap := make(FilterMap, 0)
+	for _, config := range configs {
+		if !config.Enable {
+			continue
+		}
+		pluginObject := path.Join("", pluginFolder, config.Name+".so")
+		// read file
+		plug, err := plugin.Open(pluginObject)
+		if err != nil {
+			return nil, err
+		}
+		// look up symbol
+		symPlug, err := plug.Lookup("Filter")
+		if err != nil {
+			return nil, err
+		}
+		// asset loading correct
+		filter, ok := symPlug.(Filter)
+		if !ok {
+			return nil, errors.New("unexpected type from module symbol")
+		}
+		// initiate plugin
+		err = filter.Initiate(config.Pattern)
+		if err != nil {
+			return nil, err
+		}
+		// add command to map
+		filterMap[config.Name] = filter
+	}
 
 	return filterMap, nil
 }

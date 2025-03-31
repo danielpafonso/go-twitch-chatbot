@@ -38,15 +38,18 @@ func main() {
 
 	fmt.Printf("%+v\n", configs)
 
-	// log.Println("Loading messages filters")
+	log.Println("Loading messages filters")
+	filters, err := plugins.LoadPluginsFilter(configs.Filters, "plugins")
+	if err != nil {
+		log.Panic(err)
+	}
 	// filters := plugins.LoadFilter(configs.Filters)
-	//
+
 	log.Println("Loading Commands macros")
 	commands, err := plugins.LoadPluginsCommands(configs.Commands, "plugins")
 	if err != nil {
 		log.Panic(err)
 	}
-	// commands := plugins.LoadCommands(configs.Commands)
 
 	// create ui configs
 	mainUI := ui.NewUI(titleView, banner)
@@ -61,8 +64,7 @@ func main() {
 		mainUI.WriteCmd,
 		mainUI.WriteSide,
 		commands,
-		// filters,
-		nil,
+		filters,
 	)
 	defer client.Close()
 
@@ -89,7 +91,6 @@ func main() {
 					if err != nil {
 						log.Panic(err)
 					}
-					// client.Filters = plugins.LoadFilter(configs.Filters)
 					// update prints
 					client.WriteCurrentConfigs()
 				}

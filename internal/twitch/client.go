@@ -97,10 +97,10 @@ func (client *TwitchClient) WriteCurrentConfigs() {
 	for name := range client.Commands {
 		client.WriterConfig(fmt.Sprintf(" %s\n", name))
 	}
-	// client.WriterConfig("\nEnabled Filter:\n")
-	// for name, cmd := range client.Filters {
-	// 	client.WriterConfig(fmt.Sprintf(" %s\n   Ptr: %s\n\n", name, cmd.GetPattern()))
-	// }
+	client.WriterConfig("\nEnabled Filter:\n")
+	for name, filter := range client.Filters {
+		client.WriterConfig(fmt.Sprintf(" %s\n   Ptr: %s\n\n", name, filter.GetPattern()))
+	}
 }
 
 func (client *TwitchClient) StartBot(uiStarted chan struct{}) error {
@@ -213,19 +213,18 @@ func (client *TwitchClient) ReadChat() {
 		case "PRIVMSG":
 			// get user
 			user := parsedMsg.source[1:strings.Index(parsedMsg.source, "!")]
-			client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
 
 			// filter message
-			// filtered := false
-			// for _, filter := range client.Filters {
-			// 	check := filter.Apply(parsedMsg.message)
-			// 	filtered = filtered || check
-			// }
-			// if filtered {
-			// 	client.WriterMain(fmt.Sprintf("%s:> \033[32;1m%s\033[0m\n", user, parsedMsg.message))
-			// } else {
-			// 	client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
-			// }
+			filtered := false
+			for _, filter := range client.Filters {
+				check, _ := filter.Apply(parsedMsg.message)
+				filtered = filtered || check
+			}
+			if filtered {
+				client.WriterMain(fmt.Sprintf("%s:> \033[32;1m%s\033[0m\n", user, parsedMsg.message))
+			} else {
+				client.WriterMain(fmt.Sprintf("%s:> %s\n", user, parsedMsg.message))
+			}
 
 			// check if command
 			if strings.HasPrefix(parsedMsg.message, "!") {
